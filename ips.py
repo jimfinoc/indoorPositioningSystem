@@ -131,27 +131,20 @@ def print_cells(cells):
 
 def main():
     """Pretty prints the output of iwlist scan into a table"""
-    
     cells=[[]]
     parsed_cells=[]
-    
     proc = subprocess.Popen(["iwlist", interface, "scan"],stdout=subprocess.PIPE, universal_newlines=True)
     out, err = proc.communicate()
-    
     for line in out.split("\n"):
         cell_line = match(line,"Cell ")
         if cell_line != None:
             cells.append([])
             line = cell_line[-27:]
         cells[-1].append(line.rstrip())
-
     cells=cells[1:]
-
     for cell in cells:
         parsed_cells.append(parse_cell(cell))
-        
         sort_cells(parsed_cells)
-        
         print_cells(parsed_cells)
 
 main()
