@@ -141,7 +141,9 @@ def main():
             cells.append([])
             line = cell_line[-27:]
         cells[-1].append(line.rstrip())
+    
     cells=cells[1:]
+
     for cell in cells:
         parsed_cells.append(parse_cell(cell))
         sort_cells(parsed_cells)
