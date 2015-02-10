@@ -21,13 +21,24 @@ def get_quality(cell):
     return str(int(round(float(quality[0]) / float(quality[1]) * 100))).rjust(3) + " %"
 
 def get_channel(cell):
-    return matching_line(cell,"Channel:")
+    frequency = matching_line(cell,"Frequency:")
+    channel = frequency[frequency.index("(")+9:frequency.index(")")]
+    return channel
+
+#def get_channel(cell):
+#    return matching_line(cell,"Channel:")
 
 def get_signal_level(cell):
     # Signal level is on same line as Quality data so a bit of ugly
     # hacking needed...
-    return matching_line(cell,"Quality=").split("Signal level=")[1]
+    level = matching_line(cell,"Quality=").split("Signal level=")[1]
+    level = level.split()[0].split('/')
+    return str(int(round(float(level[0]) / float(level[1]) * 100))).rjust(3) + " %"
 
+#def get_signal_level(cell):
+#    # Signal level is on same line as Quality data so a bit of ugly
+#    # hacking needed...
+#    return matching_line(cell,"Quality=").split("Signal level=")[1]
 
 def get_encryption(cell):
     enc=""
@@ -37,12 +48,31 @@ def get_encryption(cell):
         for line in cell:
             matching = match(line,"IE:")
             if matching!=None:
+                wpa2=match(matching,"IEEE 802.11i/WPA2 Version ")
+                if wpa2!=None:
+                    #enc="WPA2 v."+wpa2
+                    enc="WPA2"
                 wpa=match(matching,"WPA Version ")
                 if wpa!=None:
                     enc="WPA v."+wpa
         if enc=="":
             enc="WEP"
     return enc
+
+#def get_encryption(cell):
+#    enc=""
+#    if matching_line(cell,"Encryption key:") == "off":
+#        enc="Open"
+#    else:
+#        for line in cell:
+#            matching = match(line,"IE:")
+#            if matching!=None:
+#                wpa=match(matching,"WPA Version ")
+#                if wpa!=None:
+#                    enc="WPA v."+wpa
+#        if enc=="":
+#            enc="WEP"
+#    return enc
 
 def get_address(cell):
     return matching_line(cell,"Address: ")
@@ -141,9 +171,7 @@ def main():
             cells.append([])
             line = cell_line[-27:]
         cells[-1].append(line.rstrip())
-    
     cells=cells[1:]
-
     for cell in cells:
         parsed_cells.append(parse_cell(cell))
         sort_cells(parsed_cells)
